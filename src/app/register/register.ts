@@ -7,13 +7,14 @@ import { RouterModule, Router } from '@angular/router';
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule], // FormsModule is required for inputs
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './register.html',
-  styleUrls: ['./register.css'] // (Assuming you are using the CSS provided earlier)
+  styleUrls: ['./register.css']
 })
 export class RegisterComponent {
   email = '';
   password = '';
+  role = 'customer'; // Default role for the UI dropdown
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -23,12 +24,17 @@ export class RegisterComponent {
       return;
     }
 
-    const userData = { email: this.email, password: this.password };
+    // Include the role in the data sent to the backend
+    const userData = { 
+      email: this.email, 
+      password: this.password,
+      role: this.role 
+    };
 
     this.http.post('http://localhost:5000/api/auth/register', userData).subscribe({
       next: (res: any) => {
-        alert('Account successfully created! You can now log in.');
-        this.router.navigate(['/login']); // Send them to login page
+        alert(`Account successfully created as a ${this.role}! You can now log in.`);
+        this.router.navigate(['/login']);
       },
       error: (err) => {
         console.error(err);
