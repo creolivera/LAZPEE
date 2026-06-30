@@ -11,8 +11,15 @@ import { Product } from '../models/product.model';
   styleUrls: ['./home.css']
 })
 export class HomeComponent implements OnInit {
-  products: Product[] = [];
-  categories = [ { name: 'Electronics', icon: '💻' }, { name: 'Home Decor', icon: '🛋️' } ];
+  allProducts: Product[] = []; // Holds everything from DB
+  displayedProducts: Product[] = []; // Holds only what is currently filtered
+  
+  // Added an "All" category so users can reset the filter
+  categories = [ 
+    { name: 'All', icon: '🏪' }, 
+    { name: 'Electronics', icon: '💻' }, 
+    { name: 'Home Decor', icon: '🛋️' } 
+  ];
 
   constructor(private http: HttpClient) {}
 
@@ -21,18 +28,19 @@ export class HomeComponent implements OnInit {
   }
 
   loadProducts() {
-    this.http.get<Product[]>('http://localhost:5000/api/products').subscribe(data => this.products = data);
+    this.http.get<Product[]>('http://localhost:5000/api/products').subscribe(data => {
+      this.allProducts = data;
+      this.displayedProducts = data; // Initially show all products
+    });
   }
 
-  // This calls your backend to insert the sample products
-  seedDatabase() {
-    this.http.post('http://localhost:5000/api/products/seed', {}).subscribe({
-      next: () => {
-        alert('Products successfully added to MongoDB Atlas!');
-        this.loadProducts(); // Refresh the screen to show the new items
-      },
-      error: () => alert('Failed to seed database.')
-    });
+  // The new filter function triggered by clicking an icon
+  filterByCategory(categoryName: string) {
+    if (categoryName === 'All') {
+      this.displayedProducts = this.allProducts;
+    } else {
+      this.displayedProducts = this.allProducts.filter(p => p.category === categoryName);
+    }
   }
 
   addToCart(product: Product) {
@@ -45,9 +53,7 @@ export class HomeComponent implements OnInit {
     cart.push(product);
     localStorage.setItem('cart', JSON.stringify(cart));
     
-    // Temporarily reduce inventory on the screen to show the user it was taken
     product.inventory--;
-    
     alert(`${product.name} added to cart!`);
   }
 }
