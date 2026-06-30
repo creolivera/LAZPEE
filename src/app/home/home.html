@@ -4,14 +4,33 @@
       <div class="icon">{{ cat.icon }}</div><span>{{ cat.name }}</span>
     </div>
   </section>
+
+  <div style="text-align: center; margin-bottom: 30px;">
+    <button (click)="seedDatabase()" style="background: #28a745; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+      🚀 Click Here Once to Inject Sample Products into MongoDB
+    </button>
+  </div>
+
   <section class="flash-sale">
     <h2>FLASH SALE</h2>
     <div class="product-grid">
+      
       <div class="product-card" *ngFor="let prod of products">
-        <div class="prod-image">{{ prod.image }}</div>
-        <h4>{{ prod.name }}</h4><p class="price">${{ prod.price }}</p>
-        <button (click)="addToCart(prod)">Add to Cart</button>
+        <div class="prod-image" style="font-size: 60px; margin-bottom: 10px;">{{ prod.image }}</div>
+        <h4>{{ prod.name }}</h4>
+        <p class="price" style="color: #f53d2d; font-weight: bold; font-size: 18px;">${{ prod.price }}</p>
+        
+        <p style="color: gray; font-size: 13px; margin-bottom: 10px;">
+          Available: {{ prod.inventory }}
+        </p>
+
+        <button (click)="addToCart(prod)" 
+                [disabled]="prod.inventory === 0" 
+                [style.background]="prod.inventory === 0 ? '#ccc' : '#f53d2d'">
+          {{ prod.inventory === 0 ? 'Out of Stock' : 'Add to Cart' }}
+        </button>
       </div>
+
     </div>
   </section>
 </div>
