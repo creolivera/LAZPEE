@@ -12,17 +12,32 @@ import { RouterModule, Router } from '@angular/router';
   styleUrls: ['./login.css']
 })
 export class LoginComponent {
-  email = ''; password = '';
+  email = '';
+  password = '';
+
   constructor(private http: HttpClient, private router: Router) {}
 
   login() {
-    this.http.post('http://localhost:5000/api/auth/login', { email: this.email, password: this.password }).subscribe({
+    if (!this.email || !this.password) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    const loginData = { email: this.email, password: this.password };
+
+    this.http.post('http://localhost:5000/api/auth/login', loginData).subscribe({
       next: (res: any) => {
+        // Save the token and email to the browser so the user stays logged in
         localStorage.setItem('token', res.token);
         localStorage.setItem('email', res.email);
-        alert('Welcome back!'); this.router.navigate(['/']);
+        
+        alert('Login successful! Welcome back.');
+        this.router.navigate(['/']); // Redirect to the Home page
       },
-      error: () => alert('Invalid credentials.')
+      error: (err) => {
+        console.error(err);
+        alert('Invalid email or password. Please try again.');
+      }
     });
   }
 }
