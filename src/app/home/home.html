@@ -1,0 +1,17 @@
+<div class="home-container">
+  <section class="categories">
+    <div class="cat-item" *ngFor="let cat of categories">
+      <div class="icon">{{ cat.icon }}</div><span>{{ cat.name }}</span>
+    </div>
+  </section>
+  <section class="flash-sale">
+    <h2>FLASH SALE</h2>
+    <div class="product-grid">
+      <div class="product-card" *ngFor="let prod of products">
+        <div class="prod-image">{{ prod.image }}</div>
+        <h4>{{ prod.name }}</h4><p class="price">${{ prod.price }}</p>
+        <button (click)="addToCart(prod)">Add to Cart</button>
+      </div>
+    </div>
+  </section>
+</div>
