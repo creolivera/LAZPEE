@@ -18,9 +18,15 @@
     <a *ngIf="isSeller" routerLink="/seller-dashboard" style="text-decoration: none; color: #333; font-weight: bold; cursor: pointer;">
       🏪 Seller Hub
     </a>
+
+    <a *ngIf="isSeller" routerLink="/seller-orders" style="text-decoration: none; color: #ff6600; font-weight: bold; cursor: pointer;">
+      📦 Store Orders
+    </a>
     
     <a routerLink="/cart" style="text-decoration: none; color: #333; cursor: pointer;">🛒 Cart</a>
     
+    <a *ngIf="isLoggedIn" routerLink="/my-orders" style="text-decoration: none; color: #333; cursor: pointer;">🛍️ My Purchases</a>
+
     <a *ngIf="isLoggedIn" routerLink="/messages" style="text-decoration: none; color: #333; cursor: pointer;">💬 Messages</a>
     
     <a *ngIf="!isLoggedIn" routerLink="/login" style="text-decoration: none; color: #333; cursor: pointer;">👤 Login</a>

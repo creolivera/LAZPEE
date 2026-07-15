@@ -9,7 +9,7 @@ import { sellerGuard } from './seller.guard';
 import { CartComponent } from './cart/cart';
 import { CheckoutComponent } from './checkout/checkout';
 
-// 🚨 NEW IMPORTS: Added your two tracking components (matching your project path style)
+// 🚨 FIXED IMPORTS: Correctly pointing inside the folders to the exact file names
 import { MyOrdersComponent } from './my-orders/my-orders';
 import { SellerOrdersComponent } from './seller-orders/seller-orders';
 
