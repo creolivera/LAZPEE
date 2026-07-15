@@ -1,35 +1,74 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { CartService } from '../services/cart.service';
 
 @Component({
   selector: 'app-store',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './store.html',
-
 })
 export class StoreComponent implements OnInit {
   storeEmail: string = '';
   storeProducts: any[] = [];
 
-  constructor(private route: ActivatedRoute, private http: HttpClient) {}
+  constructor(
+    private route: ActivatedRoute, 
+    private http: HttpClient,
+    private cartService: CartService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    // Grab the seller's email from the URL (e.g., lazpee.com/store/seller@test.com)
-    this.storeEmail = this.route.snapshot.paramMap.get('email') || '';
-    this.loadStoreProducts();
+    this.storeEmail = this.route.snapshot.paramMap.get('email') 
+                   || this.route.snapshot.paramMap.get('id') 
+                   || this.route.snapshot.paramMap.get('sellerEmail') 
+                   || '';
+                   
+    if (this.storeEmail && this.storeEmail !== 'undefined') {
+      this.loadStoreProducts();
+    }
   }
 
   loadStoreProducts() {
-    this.http.get<any[]>(`http://localhost:5000/api/products/seller/${this.storeEmail}`).subscribe(data => {
-      this.storeProducts = data;
+    this.http.get<any[]>('http://localhost:5000/api/products').subscribe({
+      next: (allProducts) => {
+        const targetEmail = this.storeEmail.trim().toLowerCase();
+        
+        this.storeProducts = allProducts.filter(product => {
+          const dbEmail = (product.sellerEmail || product.email || product.seller || '');
+          return dbEmail.trim().toLowerCase() === targetEmail;
+        });
+        
+        // Refresh the UI to display the new products
+        this.cdr.detectChanges(); 
+      },
+      error: (err) => console.error('Error fetching store products:', err)
     });
   }
 
   addToCart(product: any) {
-    // Add your existing cart logic here!
-    alert(`${product.name} added to your cart!`);
+    const email = localStorage.getItem('email');
+    
+    if (!email) {
+      alert('Please log in first to add items to your cart!');
+      return;
+    }
+
+    const itemPayload = {
+      name: product.name,
+      price: product.price,
+      image: product.image || ''
+    };
+
+    this.cartService.addToCart(email, itemPayload).subscribe({
+      next: () => alert(`${product.name} successfully added to your cart! 🛒`),
+      error: (err) => {
+        console.error('Could not add item:', err);
+        alert('Failed to add item. Make sure your backend server is running!');
+      }
+    });
   }
 }

@@ -1,77 +1,87 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // 🚨 NEW: Imported ChangeDetectorRef
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // Added ChangeDetectorRef back
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
-import { CartService } from '../services/cart.service';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, RouterModule],
-  template: `
-    <div style="padding: 40px; max-width: 800px; margin: 0 auto; font-family: sans-serif;">
-      <h2 style="color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px;">🛒 Your Shopping Cart</h2>
-
-      <!-- Empty State -->
-      <div *ngIf="cartItems.length === 0" style="text-align: center; padding: 40px; color: #666;">
-        <p style="font-size: 1.2rem;">Your cart is currently empty!</p>
-        <button routerLink="/" style="background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
-          Shop Now
-        </button>
-      </div>
-
-      <!-- Items List -->
-      <div *ngIf="cartItems.length > 0">
-        <div *ngFor="let item of cartItems" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee;">
-          <div>
-            <h4 style="margin: 0 0 5px 0; color: #333;">{{ item.name }}</h4>
-            <span style="color: #666; font-size: 0.9rem;">₱{{ item.price }} x {{ item.quantity }}</span>
-          </div>
-          <strong style="color: #dc3545;">₱{{ item.price * item.quantity }}</strong>
-        </div>
-
-        <!-- Cart Total Summary -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 2px solid #333;">
-          <span style="font-size: 1.2rem; font-weight: bold;">Total Amount:</span>
-          <strong style="font-size: 1.5rem; color: #dc3545;">₱{{ getTotal() }}</strong>
-        </div>
-
-        <button routerLink="/checkout" style="width: 100%; background: #28a745; color: white; border: none; padding: 12px; font-size: 1.1rem; border-radius: 4px; cursor: pointer; margin-top: 20px; font-weight: bold;">
-          Proceed to Checkout 💳
-        </button>
-      </div>
-    </div>
-  `
+  imports: [CommonModule, FormsModule, RouterModule], // Kept FormsModule for [(ngModel)] quantity binding
+  templateUrl: './cart.html',
 })
 export class CartComponent implements OnInit {
   cartItems: any[] = [];
-  userEmail: string | null = '';
+  userEmail: string = '';
+  totalPrice: number = 0;
 
-  // 🚨 NEW: Injected 'cdr' (ChangeDetectorRef) into your constructor parameters
-  constructor(private cartService: CartService, private cdr: ChangeDetectorRef) {}
+  // Injected 'cdr' for instant UI renders
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
-    this.userEmail = localStorage.getItem('email');
+    this.userEmail = localStorage.getItem('email') || '';
     console.log('📡 [Frontend Cart] Component loaded targeting local storage key:', this.userEmail);
-    
     if (this.userEmail) {
       this.loadCart();
+    } else {
+      console.warn('No user email found. Please log in.');
     }
   }
 
+  // 1. Fetch all items in the user's cart
   loadCart() {
-    this.cartService.getCart(this.userEmail!).subscribe({
-      next: (data) => {
-        console.log('🎯 [Frontend Cart] Array data received from database hook:', data);
-        this.cartItems = data || [];
+    this.http.get<any>(`http://localhost:5000/api/cart/${this.userEmail}`).subscribe({
+      next: (response) => {
+        this.cartItems = response.items || response || []; 
         
-        // 🚨 NEW: Forcefully commands Angular to process the array data and draw it instantly!
-        this.cdr.detectChanges();
+        this.cartItems.forEach(item => {
+          if (!item.quantity) item.quantity = 1;
+        });
+
+        this.calculateTotal();
+        this.cdr.detectChanges(); // Force Angular to draw the items instantly
       },
-      error: (err) => console.error('🔴 [Frontend Cart] HTTP failure reading stream:', err)
+      error: (err) => console.error('🔴 [Frontend Cart] Error loading cart:', err)
     });
   }
 
-  getTotal(): number {
-    return this.cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  // 2. Automatically calculate the total price
+  calculateTotal() {
+    this.totalPrice = this.cartItems.reduce((sum, item) => {
+      return sum + (item.price * item.quantity);
+    }, 0);
+  }
+
+  // 3. Update the quantity of an item in the DB
+  updateQuantity(item: any, newQty: number) {
+    if (newQty < 1) {
+      item.quantity = 1; 
+      newQty = 1;
+    }
+
+    const payload = { quantity: newQty };
+    const idToSend = item._id || item.productId;
+    
+    this.http.put(`http://localhost:5000/api/cart/${this.userEmail}/update/${idToSend}`, payload).subscribe({
+      next: () => {
+        this.calculateTotal(); 
+        this.cdr.detectChanges(); // Force repaint
+      },
+      error: (err) => alert('Failed to update quantity. Check server.')
+    });
+  }
+
+  // 4. Remove an item entirely from the DB
+  removeItem(item: any) {
+    const idToSend = item._id || item.productId;
+
+    this.http.delete(`http://localhost:5000/api/cart/${this.userEmail}/remove/${idToSend}`).subscribe({
+      next: () => {
+        this.cartItems = this.cartItems.filter(c => c !== item);
+        this.calculateTotal();
+        this.cdr.detectChanges(); // Force repaint
+      },
+      error: (err) => alert('Failed to remove item. Check server.')
+    });
   }
 }

@@ -3,7 +3,10 @@
   <h1 routerLink="/" style="color: #dc3545; cursor: pointer; margin: 0;">LAZPEE</h1>
   
   <div style="flex-grow: 1; max-width: 400px; margin: 0 20px;">
-    <input type="text" placeholder="Search in lazpee..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+    <input type="text" 
+           placeholder="Search in lazpee..." 
+           (input)="onSearch($event)"
+           style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
   </div>
 
   <nav style="display: flex; gap: 20px; align-items: center;">

@@ -29,13 +29,19 @@ export class LoginComponent {
       ? 'http://localhost:5000/api/auth/login' 
       : 'http://localhost:5000/api/auth/signup';
 
-    console.log('Attempting auth request to:', url, this.authData); // Debug log
+    // 🚨 THE FIX: If logging in, ONLY send email and password. 
+    // If signing up, send the full authData (which includes the role).
+    const payload = this.isLoginMode 
+      ? { email: this.authData.email, password: this.authData.password } 
+      : this.authData;
 
-    this.http.post<any>(url, this.authData).subscribe({
+    console.log('Attempting auth request to:', url, payload);
+
+    this.http.post<any>(url, payload).subscribe({
       next: (response) => {
         if (this.isLoginMode) {
           // SAVE TO LOCAL STORAGE
-          localStorage.setItem('token', response.token); // 🚨 NEW: Save the secure token!
+          localStorage.setItem('token', response.token); 
           localStorage.setItem('email', response.email);
           localStorage.setItem('role', response.role);
           
@@ -48,9 +54,8 @@ export class LoginComponent {
         }
       },
       error: (err) => {
-        console.error('Auth system caught an error:', err); // Debug log
+        console.error('Auth system caught an error:', err);
         
-        // FIXED: Added safe navigation (?.) to prevent the button from freezing up
         this.errorMessage = err.error?.error || err.message || 'Cannot connect to backend server. Is it running?';
       }
     });

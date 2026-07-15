@@ -1,21 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { SearchService } from './services/search.service'; // 🚨 NEW: Import the search service
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './app.html', // Pointing to your specific HTML file
-  styleUrls: ['./app.css']   // Point to your CSS file if you have one
+  templateUrl: './app.html', 
+  styleUrls: ['./app.css']  
 })
 export class AppComponent implements OnInit {
   isLoggedIn = false;
   isSeller = false;
-  isAdmin = false; // NEW: Track if the logged-in user is an admin
+  isAdmin = false; 
   userEmail = '';
 
-  constructor(private router: Router) {}
+  // 🚨 MODIFIED: Injected SearchService into the constructor
+  constructor(
+    private router: Router,
+    private searchService: SearchService
+  ) {}
 
   ngOnInit() {
     // Check local storage to see if someone is logged in when the app loads
@@ -28,8 +33,14 @@ export class AppComponent implements OnInit {
       
       // Handle the 3-role system checks dynamically
       this.isSeller = role === 'seller';
-      this.isAdmin = role === 'admin'; // NEW: Flag true if user is an admin
+      this.isAdmin = role === 'admin'; 
     }
+  }
+
+  // 🚨 NEW: This captures typing from the header and sends it to the service
+  onSearch(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.searchService.updateSearchTerm(target.value);
   }
 
   logout() {
@@ -37,7 +48,7 @@ export class AppComponent implements OnInit {
     localStorage.clear();
     this.isLoggedIn = false;
     this.isSeller = false;
-    this.isAdmin = false; // NEW: Reset admin status on logout
+    this.isAdmin = false; 
     this.userEmail = '';
     
     // Redirect to home page
