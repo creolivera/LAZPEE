@@ -9,6 +9,10 @@ import { sellerGuard } from './seller.guard';
 import { CartComponent } from './cart/cart';
 import { CheckoutComponent } from './checkout/checkout';
 
+// 🚨 NEW IMPORTS: Added your two tracking components (matching your project path style)
+import { MyOrdersComponent } from './my-orders/my-orders';
+import { SellerOrdersComponent } from './seller-orders/seller-orders';
+
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent }, 
@@ -17,16 +21,25 @@ export const routes: Routes = [
   
   { path: 'admin-dashboard', component: AdminComponent }, 
   
-  // 🚨 FIXED: Added these inside the array so Angular knows where to look!
   { path: 'cart', component: CartComponent },
   { path: 'checkout', component: CheckoutComponent },
+  
+  // 🚀 NEW: Customer order tracking history page
+  { path: 'my-orders', component: MyOrdersComponent }, 
   
   { 
     path: 'seller-dashboard', 
     component: SellerComponent, 
     canActivate: [sellerGuard] 
   },
+
+  // 🚀 NEW: Seller order status management page (🔒 Guarded for safety!)
+  { 
+    path: 'seller-orders', 
+    component: SellerOrdersComponent, 
+    canActivate: [sellerGuard] 
+  },
   
-  // ⚠️ CRITICAL: The wildcard fallback MUST always stay at the very bottom
+  // ⚠️ CRITICAL: The wildcard fallback stays safely at the very bottom
   { path: '**', redirectTo: '' } 
 ];

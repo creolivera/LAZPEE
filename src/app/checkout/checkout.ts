@@ -12,7 +12,6 @@ import { OrderService } from '../services/order.service';
   template: `
     <div style="padding: 40px; max-width: 900px; margin: 0 auto; font-family: sans-serif; display: flex; gap: 40px; flex-wrap: wrap;">
       
-      <!-- Left Side: Shipping Form -->
       <div style="flex: 2; min-width: 300px; background: #fff; padding: 25px; border: 1px solid #eee; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
         <h2 style="color: #333; margin-top: 0; border-bottom: 2px solid #dc3545; padding-bottom: 10px;">💳 Shipping Details</h2>
         
@@ -39,7 +38,6 @@ import { OrderService } from '../services/order.service';
         </form>
       </div>
 
-      <!-- Right Side: Order Summary -->
       <div style="flex: 1; min-width: 250px; background: #f8f9fa; padding: 25px; border: 1px solid #e9ecef; border-radius: 8px; height: fit-content;">
         <h3 style="margin-top: 0; color: #333;">Order Summary</h3>
         
@@ -88,12 +86,11 @@ export class CheckoutComponent implements OnInit {
 
   loadCartData() {
     this.cartService.getCart(this.userEmail!).subscribe({
-      // FIXED: Explicitly typed 'data' as 'any'
       next: (data: any) => {
-        this.checkoutItems = data || [];
+        // Safe check: extracts data.items array if nested, else drops directly to data
+        this.checkoutItems = data.items || data || [];
         this.cdr.detectChanges(); 
       },
-      // FIXED: Explicitly typed 'err' as 'any'
       error: (err: any) => console.error('🔴 Error loading cart for checkout:', err)
     });
   }
@@ -113,12 +110,12 @@ export class CheckoutComponent implements OnInit {
     };
 
     this.orderService.placeOrder(payload).subscribe({
-      // FIXED: Explicitly typed 'res' as 'any'
       next: (res: any) => {
-        alert(`🎉 Success! ${res.message}\nReference ID: ${res.orderId}`);
-        this.router.navigate(['/']); 
+        alert(`🎉 Success! ${res.message || 'Order Placed.'}`);
+        
+        // 🚨 MODIFIED: Automatically redirect straight to tracking details component
+        this.router.navigate(['/my-orders']); 
       },
-      // FIXED: Explicitly typed 'err' as 'any'
       error: (err: any) => {
         console.error('🔴 Order failed:', err);
         alert('Could not complete checkout. Make sure your backend server is running.');
