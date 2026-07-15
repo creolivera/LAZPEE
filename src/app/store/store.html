@@ -1,0 +1,31 @@
+<div class="store-container" style="padding: 20px;">
+  <div style="background: #f4f4f4; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+    <h2>🏪 Welcome to {{ storeEmail }}'s Store</h2>
+    <p>Browse all products exclusively from this seller.</p>
+    
+    <button [routerLink]="['/messages']" [queryParams]="{ to: storeEmail }" style="margin-top: 10px; padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+      💬 Chat with Seller
+    </button>
+  </div>
+
+  <div class="product-grid" style="display: flex; flex-wrap: wrap; gap: 20px;">
+    <div class="product-card" *ngFor="let product of storeProducts" style="border: 1px solid #ddd; padding: 15px; border-radius: 8px; width: 200px;">
+      
+      <img [src]="product.image" alt="{{ product.name }}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px;" />
+      
+      <h3>{{ product.name }}</h3>
+      <p class="price" style="font-size: 1.2rem; font-weight: bold; color: #ff4d4f;">₱{{ product.price }}</p>
+      <p style="color: #666; font-size: 0.9rem;">Category: {{ product.category }}</p>
+      <p class="inventory" [style.color]="product.inventory === 0 ? 'red' : 'green'">Available: {{ product.inventory }}</p>
+      
+      <button style="width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;" (click)="addToCart(product)" [disabled]="product.inventory === 0">
+        {{ product.inventory === 0 ? 'Out of Stock' : 'Add to Cart' }}
+      </button>
+
+    </div>
+    
+    <div *ngIf="storeProducts.length === 0" style="width: 100%; text-align: center; color: #777;">
+      This seller doesn't have any products listed right now.
+    </div>
+  </div>
+</div>

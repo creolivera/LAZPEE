@@ -1,14 +1,35 @@
-<header class="top-nav">
-  <div class="logo" routerLink="/">LAZPEE</div>
-  <div class="search-bar">
-    <input type="text" placeholder="Search in lazpee...">
-    <button>🔍</button>
+<header style="display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: white; border-bottom: 1px solid #eee;">
+  
+  <h1 routerLink="/" style="color: #dc3545; cursor: pointer; margin: 0;">LAZPEE</h1>
+  
+  <div style="flex-grow: 1; max-width: 400px; margin: 0 20px;">
+    <input type="text" placeholder="Search in lazpee..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
   </div>
-  <div class="nav-actions">
-    <button class="cart-btn" routerLink="/seller-dashboard" style="color: #a134f6; font-weight: bold;">🏪 Seller Hub</button>
+
+  <nav style="display: flex; gap: 20px; align-items: center;">
     
-    <button class="cart-btn" routerLink="/cart">🛒 Cart</button>
-    <button class="profile-btn" routerLink="/login">👤 Login</button>
-  </div>
+    <a *ngIf="isAdmin" routerLink="/admin-dashboard" style="text-decoration: none; color: #28a745; font-weight: bold; cursor: pointer;">
+      🛡️ Admin Panel
+    </a>
+
+    <a *ngIf="isSeller" routerLink="/seller-dashboard" style="text-decoration: none; color: #333; font-weight: bold; cursor: pointer;">
+      🏪 Seller Hub
+    </a>
+    
+    <a routerLink="/cart" style="text-decoration: none; color: #333; cursor: pointer;">🛒 Cart</a>
+    
+    <a *ngIf="isLoggedIn" routerLink="/messages" style="text-decoration: none; color: #333; cursor: pointer;">💬 Messages</a>
+    
+    <a *ngIf="!isLoggedIn" routerLink="/login" style="text-decoration: none; color: #333; cursor: pointer;">👤 Login</a>
+    
+    <div *ngIf="isLoggedIn" style="display: flex; align-items: center; gap: 15px;">
+      <span style="font-size: 0.9rem; color: #666;">Hi, {{ userEmail }}</span>
+      <button (click)="logout()" style="background: transparent; border: 1px solid #dc3545; color: #dc3545; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+        Logout
+      </button>
+    </div>
+
+  </nav>
 </header>
+
 <router-outlet></router-outlet>

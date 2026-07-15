@@ -1,32 +1,45 @@
-<div class="home-container">
-  <section class="categories">
-    <div class="cat-item" *ngFor="let cat of categories" 
-         (click)="filterByCategory(cat.name)" 
-         style="cursor: pointer; transition: transform 0.2s;">
-      <div class="icon">{{ cat.icon }}</div><span>{{ cat.name }}</span>
-    </div>
-  </section>
+<div style="display: flex; justify-content: center; gap: 20px; margin: 20px 0;">
+  <div (click)="filterCategory('All')" style="cursor: pointer; text-align: center;">
+    <span style="font-size: 2rem;">🏪</span><br/>All
+  </div>
+  <div (click)="filterCategory('Electronics')" style="cursor: pointer; text-align: center;">
+    <span style="font-size: 2rem;">💻</span><br/>Electronics
+  </div>
+  <div (click)="filterCategory('Home Decor')" style="cursor: pointer; text-align: center;">
+    <span style="font-size: 2rem;">🛋️</span><br/>Home Decor
+  </div>
+  <div (click)="filterCategory('Beverages')" style="cursor: pointer; text-align: center;">
+    <span style="font-size: 2rem;">🥤</span><br/>Beverages
+  </div>
+</div>
 
-  <section class="flash-sale">
-    <h2>FLASH SALE</h2>
-    <div class="product-grid">
+<div class="dashboard-section" style="background: #ffe5e5; padding: 20px; border-radius: 8px;">
+  <h2>FLASH SALE</h2>
+  
+  <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px;">
+    <div *ngFor="let product of filteredProducts" style="background: white; padding: 15px; border-radius: 8px; width: 200px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
       
-      <div class="product-card" *ngFor="let prod of displayedProducts">
-        <div class="prod-image" style="font-size: 60px; margin-bottom: 10px;">{{ prod.image }}</div>
-        <h4>{{ prod.name }}</h4>
-        <p class="price" style="color: #f53d2d; font-weight: bold; font-size: 18px;">${{ prod.price }}</p>
-        
-        <p style="color: gray; font-size: 13px; margin-bottom: 10px;">
-          Available: {{ prod.inventory }}
-        </p>
+      <img [src]="product.image" alt="{{ product.name }}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px;" />
+      
+      <h3 style="margin: 10px 0 5px 0;">{{ product.name }}</h3>
+      <p style="color: #ff4d4f; font-weight: bold; font-size: 1.2rem; margin: 0;">₱{{ product.price }}</p>
+      <p style="font-size: 0.8rem; color: #666;">Stock: {{ product.inventory }}</p>
+      
+      <a [routerLink]="['/store', product.sellerEmail]" style="display: block; font-size: 0.85rem; color: #007bff; text-decoration: none; margin: 10px 0 5px 0;">
+        🏪 Visit Seller Store
+      </a>
 
-        <button (click)="addToCart(prod)" 
-                [disabled]="prod.inventory === 0" 
-                [style.background]="prod.inventory === 0 ? '#ccc' : '#f53d2d'">
-          {{ prod.inventory === 0 ? 'Out of Stock' : 'Add to Cart' }}
-        </button>
-      </div>
+      <a [routerLink]="['/messages', product.sellerEmail]" style="display: block; font-size: 0.85rem; color: #28a745; text-decoration: none; margin-bottom: 10px;">
+        💬 Message Seller
+      </a>
 
+      <button (click)="addToCart(product)" style="background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; width: 100%;">
+        Add to Cart
+      </button>
     </div>
-  </section>
+    
+    <div *ngIf="filteredProducts.length === 0" style="width: 100%; text-align: center; color: #777; padding: 20px 0;">
+      No products found in this category.
+    </div>
+  </div>
 </div>

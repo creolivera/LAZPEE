@@ -1,0 +1,60 @@
+<div style="display: flex; height: calc(100vh - 80px); background: #f5f5f5; font-family: sans-serif;">
+  
+  <div style="width: 300px; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column;">
+    <div style="padding: 20px; border-bottom: 1px solid #eee; background: #dc3545; color: white;">
+      <h3 style="margin: 0;">📨 LAZPEE Chat Inbox</h3>
+    </div>
+    <div style="flex-grow: 1; overflow-y: auto;">
+      <div *ngFor="let contact of contacts" 
+           (click)="selectContact(contact)"
+           [style.background]="contact === activeContact ? '#ffe5e5' : 'transparent'"
+           style="padding: 15px 20px; border-bottom: 1px solid #f9f9f9; cursor: pointer; transition: 0.2s;">
+        <div style="font-weight: bold; color: #333; font-size: 0.95rem; word-break: break-all;">👤 {{ contact }}</div>
+        <span style="font-size: 0.8rem; color: #888;">Click to open message history</span>
+      </div>
+      <div *ngIf="contacts.length === 0" style="text-align: center; color: #aaa; margin-top: 40px; padding: 20px; font-size: 0.9rem;">
+        No active conversations yet.
+      </div>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1; display: flex; flex-direction: column; background: #fff;">
+    
+    <div *ngIf="activeContact" style="flex-grow: 1; display: flex; flex-direction: column; height: 100%;">
+      <div style="padding: 15px 20px; border-bottom: 1px solid #eee; background: #fafafa; font-weight: bold; color: #555;">
+        Chatting with: <span style="color: #dc3545;">{{ activeContact }}</span>
+      </div>
+
+      <div style="flex-grow: 1; padding: 20px; overflow-y: auto; background: #fdfdfd; display: flex; flex-direction: column; gap: 12px;">
+        <div *ngFor="let msg of chatMessages" 
+             [style.align-self]="msg.senderEmail === currentUserEmail ? 'flex-end' : 'flex-start'"
+             [style.background]="msg.senderEmail === currentUserEmail ? '#dc3545' : '#e9ecef'"
+             [style.color]="msg.senderEmail === currentUserEmail ? 'white' : '#333'"
+             style="max-width: 60%; padding: 10px 15px; border-radius: 12px; font-size: 0.95rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); word-break: break-word;">
+          <div>{{ msg.messageText }}</div>
+          <div [style.color]="msg.senderEmail === currentUserEmail ? '#ffcccc' : '#888'" style="font-size: 0.7rem; margin-top: 4px; text-align: right;">
+            {{ msg.timestamp | date:'shortTime' }}
+          </div>
+        </div>
+      </div>
+
+      <div style="padding: 15px 20px; border-top: 1px solid #eee; background: #fff; display: flex; gap: 10px;">
+        <input type="text" 
+               [(ngModel)]="newMessageText" 
+               (keyup.enter)="sendMessage()"
+               placeholder="Type a message..." 
+               style="flex-grow: 1; padding: 12px; border: 1px solid #ccc; border-radius: 6px; outline: none; font-size: 0.95rem;" />
+        <button (click)="sendMessage()" 
+                style="background: #dc3545; color: white; border: none; padding: 0 25px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;">
+          Send
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="!activeContact" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #bbb;">
+      <span style="font-size: 4rem;">💬</span>
+      <p style="margin-top: 10px; font-size: 1rem;">Select a contact from the left menu sidebar pane to read thread messages.</p>
+    </div>
+
+  </div>
+</div>

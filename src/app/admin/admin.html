@@ -1,0 +1,47 @@
+<div style="padding: 40px; max-width: 900px; margin: 40px auto; font-family: sans-serif;">
+  
+  <h2 style="color: #28a745; border-bottom: 3px solid #28a745; padding-bottom: 10px; margin-bottom: 20px;">
+    🛡️ Admin Dashboard
+  </h2>
+
+  <div *ngIf="errorMessage" style="background: #ffe5e5; color: #dc3545; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+    {{ errorMessage }}
+  </div>
+
+  <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+    <h3 style="margin-top: 0; color: #333;">Manage Seller Accounts</h3>
+    
+    <table style="width: 100%; border-collapse: collapse; text-align: left; margin-top: 15px;">
+      <thead>
+        <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
+          <th style="padding: 12px; color: #555;">Email Address</th>
+          <th style="padding: 12px; color: #555;">Role</th>
+          <th style="padding: 12px; color: #555;">Status</th>
+          <th style="padding: 12px; color: #555;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of sellers" style="border-bottom: 1px solid #eee; transition: background 0.2s;">
+          <td style="padding: 12px; font-weight: bold;">{{ user.email }}</td>
+          <td style="padding: 12px; text-transform: capitalize;">{{ user.role }}</td>
+          
+          <td style="padding: 12px;">
+            <span *ngIf="user.isApproved" style="color: #28a745; font-weight: bold; background: #e6f4ea; padding: 4px 8px; border-radius: 12px; font-size: 0.85rem;">Approved</span>
+            <span *ngIf="!user.isApproved" style="color: #fd7e14; font-weight: bold; background: #fff4e5; padding: 4px 8px; border-radius: 12px; font-size: 0.85rem;">Pending</span>
+          </td>
+          
+          <td style="padding: 12px;">
+            <button *ngIf="!user.isApproved" (click)="approveSeller(user.email)" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(40,167,69,0.3);">
+              Approve Access
+            </button>
+            <span *ngIf="user.isApproved" style="color: #999; font-size: 0.9rem; font-style: italic;">No action needed</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div *ngIf="sellers.length === 0" style="padding: 30px; text-align: center; color: #777; font-size: 1.1rem;">
+      No seller accounts found in the database.
+    </div>
+  </div>
+</div>
